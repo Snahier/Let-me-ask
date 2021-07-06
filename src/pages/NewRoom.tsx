@@ -1,15 +1,35 @@
 import { darken } from "polished"
-// import { useContext } from "react"
-import { Link } from "react-router-dom"
+import { FormEvent, useContext, useState } from "react"
+import { Link, useHistory } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import illustrationSvg from "../assets/images/illustration.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { Button } from "../components/Button"
+import { AuthContext } from "../contexts/AuthContext"
+import { database } from "../services/firebase"
 
 interface NewRoomProps {}
 
 export const NewRoom = ({ ...props }: NewRoomProps) => {
-  // const { user } = useContext(AuthContext)
+  const { user } = useContext(AuthContext)
+  const history = useHistory()
+
+  const [newRoom, setNewRoom] = useState("")
+
+  const handleCreateRoom = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (newRoom.trim() === "") return
+
+    const roomRef = database.ref("rooms")
+
+    const firebaseRoom = await roomRef.push({
+      title: newRoom,
+      authorId: user?.id,
+    })
+
+    history.push(`/rooms/${firebaseRoom.key}`)
+  }
 
   return (
     <StyledNewRoom {...props}>
@@ -30,8 +50,13 @@ export const NewRoom = ({ ...props }: NewRoomProps) => {
         {/* <h1>{user?.name}</h1> */}
         <Title>Crie uma nova sala</Title>
 
-        <Form onSubmit={(event) => event.preventDefault()}>
-          <PageNameInput type="text" placeholder="Nome da sala" />
+        <Form onSubmit={handleCreateRoom}>
+          <PageNameInput
+            type="text"
+            placeholder="Nome da sala"
+            value={newRoom}
+            onChange={(event) => setNewRoom(event.target.value)}
+          />
 
           <CreateRoomButton>Criar sala</CreateRoomButton>
         </Form>
