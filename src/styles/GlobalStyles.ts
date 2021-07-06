@@ -19,5 +19,11 @@ export const GlobalStyles = createGlobalStyle`
     textarea {
       font: 400 16px "Roboto", sans-serif;
     }
+
+    html,
+    body,
+    #root {
+      height: 100vh;
+    }
   `}
 `
