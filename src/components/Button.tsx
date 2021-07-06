@@ -1,7 +1,7 @@
-import { HTMLAttributes, ReactNode } from "react"
+import { ButtonHTMLAttributes, ReactNode } from "react"
 import styled from "styled-components"
 
-interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text?: string | ReactNode
   children?: ReactNode
 }
@@ -20,7 +20,12 @@ const StyledButton = styled.button`
   width: 100%;
   padding: 1rem;
 
-  &:hover {
+  &:hover,
+  &:active {
     cursor: pointer;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `
