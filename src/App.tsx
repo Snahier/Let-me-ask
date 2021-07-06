@@ -8,8 +8,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthContextProvider>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/rooms/new" component={NewRoom} />
+          <Route path="/" component={Home} exact />
+          <Route path="/rooms/new" component={NewRoom} />
+          <Route path="/rooms/:id" component={Room} />
       </AuthContextProvider>
     </BrowserRouter>
   )
