@@ -124,8 +124,6 @@ const Main = styled.main`
 
 const GoogleButton = styled(Button)`
   ${({ theme }) => css`
-    transition: background-color 0.2s;
-
     margin-top: 3.5rem;
 
     border: none;
@@ -180,8 +178,6 @@ const PageCodeInput = styled.input`
 
 const EnterRoomButton = styled(Button)`
   ${({ theme }) => css`
-    transition: background-color 0.2s;
-
     margin-top: 1rem;
 
     border: none;

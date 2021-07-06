@@ -11,6 +11,8 @@ export const Button = ({ text, children, ...props }: ButtonProps) => {
 }
 
 const StyledButton = styled.button`
+  transition: background-color 0.2s;
+
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -18,6 +20,7 @@ const StyledButton = styled.button`
   gap: 0.5rem;
 
   width: 100%;
+  height: max-content;
   padding: 1rem;
 
   &:hover,
