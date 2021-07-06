@@ -25,7 +25,7 @@ export const Header = ({ ...props }: HeaderProps) => {
   )
 }
 
-const StyledHeader = styled.div`
+const StyledHeader = styled.header`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
