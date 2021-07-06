@@ -1,4 +1,5 @@
 import { darken } from "polished"
+import { useHistory } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import googleIconSvg from "../assets/images/google-icon.svg"
 import illustrationSvg from "../assets/images/illustration.svg"
@@ -9,6 +10,10 @@ import { Divider } from "../components/Divider"
 interface HomeProps {}
 
 export const Home = ({ ...props }: HomeProps) => {
+  const history = useHistory()
+
+  const navigateToNewRoom = () => history.push("/rooms/new")
+
   return (
     <StyledHome {...props}>
       <Aside>
@@ -25,7 +30,7 @@ export const Home = ({ ...props }: HomeProps) => {
       <Main>
         <img src={logoSvg} alt="Let me ask" />
 
-        <GoogleButton>
+        <GoogleButton onClick={navigateToNewRoom}>
           <img src={googleIconSvg} alt="Logo da Google" />
           Crie sua sala com o Google
         </GoogleButton>

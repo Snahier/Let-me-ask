@@ -1,4 +1,5 @@
 import { darken } from "polished"
+import { Link } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import illustrationSvg from "../assets/images/illustration.svg"
 import logoSvg from "../assets/images/logo.svg"
@@ -32,7 +33,7 @@ export const NewRoom = ({ ...props }: NewRoomProps) => {
         </Form>
 
         <GoToExistentPageText>
-          Quer entrar em uma sala já existente? <a href="#test">Clique aqui</a>
+          Quer entrar em uma sala já existente? <Link to="/">Clique aqui</Link>
         </GoToExistentPageText>
       </Main>
     </StyledNewRoom>
