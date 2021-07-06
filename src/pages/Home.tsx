@@ -6,13 +6,23 @@ import illustrationSvg from "../assets/images/illustration.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { Button } from "../components/Button"
 import { Divider } from "../components/Divider"
+import { auth, firebase } from "../services/firebase"
 
 interface HomeProps {}
 
 export const Home = ({ ...props }: HomeProps) => {
   const history = useHistory()
 
-  const navigateToNewRoom = () => history.push("/rooms/new")
+  const handleCreateRoom = () => {
+    const provider = new firebase.auth.GoogleAuthProvider()
+
+    try {
+      auth.signInWithPopup(provider)
+      history.push("/rooms/new")
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <StyledHome {...props}>
@@ -30,7 +40,7 @@ export const Home = ({ ...props }: HomeProps) => {
       <Main>
         <img src={logoSvg} alt="Let me ask" />
 
-        <GoogleButton onClick={navigateToNewRoom}>
+        <GoogleButton onClick={handleCreateRoom}>
           <img src={googleIconSvg} alt="Logo da Google" />
           Crie sua sala com o Google
         </GoogleButton>
