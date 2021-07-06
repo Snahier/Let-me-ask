@@ -1,5 +1,5 @@
 import { darken } from "polished"
-import { useContext } from "react"
+import { FormEvent, useContext, useState } from "react"
 import { useHistory } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import googleIconSvg from "../assets/images/google-icon.svg"
@@ -8,6 +8,7 @@ import logoSvg from "../assets/images/logo.svg"
 import { Button } from "../components/Button"
 import { Divider } from "../components/Divider"
 import { AuthContext } from "../contexts/AuthContext"
+import { database } from "../services/firebase"
 
 interface HomeProps {}
 
@@ -19,6 +20,23 @@ export const Home = ({ ...props }: HomeProps) => {
     if (!user) await signInWithGoogle()
 
     history.push("/rooms/new")
+  }
+
+  const [roomCode, setRoomCode] = useState("")
+
+  const handleJoinRoom = async (event: FormEvent) => {
+    event.preventDefault()
+
+    if (roomCode.trim() === "") return
+
+    const roomRef = await database.ref(`rooms/${roomCode}`).get()
+
+    if (!roomRef.exists()) {
+      alert("Room does not exist")
+      return
+    }
+
+    history.push(`/rooms/${roomCode}`)
   }
 
   return (
@@ -48,8 +66,13 @@ export const Home = ({ ...props }: HomeProps) => {
           <Divider />
         </DividerWrapper>
 
-        <Form onSubmit={(event) => event.preventDefault()}>
-          <PageCodeInput type="text" placeholder="Digite o código da sala" />
+        <Form onSubmit={handleJoinRoom}>
+          <PageCodeInput
+            type="text"
+            placeholder="Digite o código da sala"
+            value={roomCode}
+            onChange={(event) => setRoomCode(event.target.value)}
+          />
 
           <EnterRoomButton>Entrar na sala</EnterRoomButton>
         </Form>
