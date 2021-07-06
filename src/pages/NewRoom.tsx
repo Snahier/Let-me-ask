@@ -1,4 +1,5 @@
 import { darken } from "polished"
+// import { useContext } from "react"
 import { Link } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import illustrationSvg from "../assets/images/illustration.svg"
@@ -8,6 +9,8 @@ import { Button } from "../components/Button"
 interface NewRoomProps {}
 
 export const NewRoom = ({ ...props }: NewRoomProps) => {
+  // const { user } = useContext(AuthContext)
+
   return (
     <StyledNewRoom {...props}>
       <Aside>
@@ -24,6 +27,7 @@ export const NewRoom = ({ ...props }: NewRoomProps) => {
       <Main>
         <img src={logoSvg} alt="Let me ask" />
 
+        {/* <h1>{user?.name}</h1> */}
         <Title>Crie uma nova sala</Title>
 
         <Form onSubmit={(event) => event.preventDefault()}>

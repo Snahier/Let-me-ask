@@ -1,4 +1,5 @@
 import { darken } from "polished"
+import { useContext } from "react"
 import { useHistory } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import googleIconSvg from "../assets/images/google-icon.svg"
@@ -6,22 +7,18 @@ import illustrationSvg from "../assets/images/illustration.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { Button } from "../components/Button"
 import { Divider } from "../components/Divider"
-import { auth, firebase } from "../services/firebase"
+import { AuthContext } from "../contexts/AuthContext"
 
 interface HomeProps {}
 
 export const Home = ({ ...props }: HomeProps) => {
   const history = useHistory()
+  const { user, signInWithGoogle } = useContext(AuthContext)
 
-  const handleCreateRoom = () => {
-    const provider = new firebase.auth.GoogleAuthProvider()
+  const handleCreateRoom = async () => {
+    if (!user) await signInWithGoogle()
 
-    try {
-      auth.signInWithPopup(provider)
-      history.push("/rooms/new")
-    } catch (error) {
-      console.error(error)
-    }
+    history.push("/rooms/new")
   }
 
   return (
