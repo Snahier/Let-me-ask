@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
+import { Question } from "../components/Question"
 import { AuthContext } from "../contexts/AuthContext"
 import { database } from "../services/firebase"
 
@@ -24,7 +25,7 @@ type FirebaseQuestions = Record<
   }
 >
 
-type Question = {
+type IQuestion = {
   id: string
   author: {
     name: string
@@ -42,11 +43,11 @@ export const Room = ({ ...props }: RoomProps) => {
   const { id: roomId } = useParams<RoomParams>()
 
   const [title, setTitle] = useState()
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<IQuestion[]>([])
   useEffect(() => {
     const roomRef = database.ref(`rooms/${roomId}`)
 
-    roomRef.once("value", (room) => {
+    roomRef.on("value", (room) => {
       const databaseRoom = room.val()
       const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {}
 
@@ -80,7 +81,7 @@ export const Room = ({ ...props }: RoomProps) => {
         name: user.name,
         avatar: user.avatar,
       },
-      isHighlited: false,
+      isHighlighted: false,
       isAnswered: false,
     }
 
@@ -98,35 +99,34 @@ export const Room = ({ ...props }: RoomProps) => {
         {questions.length > 0 && <Pill>{questions.length} pergunta(s)</Pill>}
       </TitleContainer>
 
-      <Content>
-        <AskContainer>
-          <TextArea
-            placeholder="O que você quer perguntar?"
-            value={newQuestion}
-            onChange={(event) => setNewQuestion(event.target.value)}
-          />
+      <AskContainer>
+        <TextArea
+          placeholder="O que você quer perguntar?"
+          value={newQuestion}
+          onChange={(event) => setNewQuestion(event.target.value)}
+        />
 
-          {user ? (
-            <UserContainer>
-              <UserAvatar
-                src={user.avatar as string}
-                alt={user.name as string}
-              />
-              <UserName>{user.name}</UserName>
-            </UserContainer>
-          ) : (
-            <LogInText>
-              Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
-            </LogInText>
-          )}
+        {user ? (
+          <UserContainer>
+            <UserAvatar src={user.avatar as string} alt={user.name as string} />
+            <UserName>{user.name}</UserName>
+          </UserContainer>
+        ) : (
+          <LogInText>
+            Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
+          </LogInText>
+        )}
 
-          <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
-            Enviar pergunta
-          </SendQuestionButton>
-        </AskContainer>
+        <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
+          Enviar pergunta
+        </SendQuestionButton>
+      </AskContainer>
 
-        <pre>{JSON.stringify(questions, null, 2)}</pre>
-      </Content>
+      <QuestionsContainer>
+        {questions.map((question) => (
+          <Question key={question.id} data={question} />
+        ))}
+      </QuestionsContainer>
     </StyledRoom>
   )
 }
@@ -135,9 +135,10 @@ const StyledRoom = styled.div`
   display: grid;
   grid-template-rows: max-content 1fr;
   grid:
-    "header header   header" max-content
-    ".      title    .     " max-content
-    ".      content  .     " 1fr
+    "header header    header"
+    ".      title     .     "
+    ".      form      .     "
+    ".      questions .     " 1fr
     / 1fr 50rem 1fr;
 
   min-height: 100vh;
@@ -172,13 +173,9 @@ const Pill = styled.div`
   `}
 `
 
-const Content = styled.div`
-  grid-area: content;
-
-  margin-top: 1rem;
-`
-
 const AskContainer = styled.form`
+  grid-area: form;
+
   display: grid;
   grid:
     "textarea textarea  "
@@ -186,6 +183,8 @@ const AskContainer = styled.form`
     /1fr max-content;
   gap: 1rem 0;
   align-items: center;
+
+  margin-top: 1rem;
 `
 
 const TextArea = styled.textarea`
@@ -252,4 +251,12 @@ const UserName = styled.span`
   font-family: Roboto;
   font-size: 0.875rem;
   font-weight: 500;
+`
+
+const QuestionsContainer = styled.div`
+  grid-area: questions;
+  display: grid;
+  gap: 0.5rem;
+
+  margin-top: 2rem;
 `
