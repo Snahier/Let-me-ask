@@ -58,9 +58,19 @@ export const Room = ({ ...props }: RoomProps) => {
             onChange={(event) => setNewQuestion(event.target.value)}
           />
 
-          <LogInText>
-            Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
-          </LogInText>
+          {user ? (
+            <UserContainer>
+              <UserAvatar
+                src={user.avatar as string}
+                alt={user.name as string}
+              />
+              <UserName>{user.name}</UserName>
+            </UserContainer>
+          ) : (
+            <LogInText>
+              Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
+            </LogInText>
+          )}
 
           <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
             Enviar pergunta
@@ -122,7 +132,7 @@ const AskContainer = styled.form`
   display: grid;
   grid:
     "textarea textarea  "
-    "login    sendButton"
+    "userArea sendButton"
     /1fr max-content;
   gap: 1rem 0;
   align-items: center;
@@ -161,7 +171,7 @@ const SendQuestionButton = styled(Button)`
 
 const LogInText = styled.p`
   ${({ theme }) => css`
-    grid-area: login;
+    grid-area: userArea;
 
     color: ${theme.colors.grayDark};
 
@@ -169,4 +179,27 @@ const LogInText = styled.p`
       color: ${theme.colors.purple};
     }
   `}
+`
+
+const UserContainer = styled.div`
+  grid-area: userArea;
+
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: center;
+  gap: 0 1rem;
+`
+
+const UserAvatar = styled.img`
+  width: 2rem;
+  height: 2rem;
+
+  border-radius: 50%;
+`
+
+const UserName = styled.span`
+  font-family: Roboto;
+  font-size: 0.875rem;
+  font-weight: 500;
 `
