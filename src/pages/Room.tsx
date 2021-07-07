@@ -1,5 +1,5 @@
 import { darken } from "polished"
-import { FormEvent, useContext, useState } from "react"
+import { FormEvent, useContext, useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import { Button } from "../components/Button"
@@ -11,11 +11,59 @@ type RoomParams = {
   id: string
 }
 
+type FirebaseQuestions = Record<
+  string,
+  {
+    author: {
+      name: string
+      avatar: string
+    }
+    content: string
+    isAnswered: boolean
+    isHighlighted: boolean
+  }
+>
+
+type Question = {
+  id: string
+  author: {
+    name: string
+    avatar: string
+  }
+  content: string
+  isAnswered: boolean
+  isHighlighted: boolean
+}
+
 interface RoomProps {}
 
 export const Room = ({ ...props }: RoomProps) => {
   const { user } = useContext(AuthContext)
   const { id: roomId } = useParams<RoomParams>()
+
+  const [title, setTitle] = useState()
+  const [questions, setQuestions] = useState<Question[]>([])
+  useEffect(() => {
+    const roomRef = database.ref(`rooms/${roomId}`)
+
+    roomRef.once("value", (room) => {
+      const databaseRoom = room.val()
+      const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {}
+
+      const parsedQuestions = Object.entries(firebaseQuestions).map(
+        ([key, value]) => ({
+          id: key,
+          content: value.content,
+          author: value.author,
+          isHighlighted: value.isHighlighted,
+          isAnswered: value.isAnswered,
+        })
+      )
+
+      setTitle(databaseRoom.title)
+      setQuestions(parsedQuestions)
+    })
+  }, [roomId])
 
   const [newQuestion, setNewQuestion] = useState("")
 
@@ -46,8 +94,8 @@ export const Room = ({ ...props }: RoomProps) => {
       <Header roomCode={roomId} style={{ gridArea: "header" }} />
 
       <TitleContainer>
-        <RoomName>Sala React Q&amp;A</RoomName>
-        <Pill>4 perguntas</Pill>
+        <RoomName>Sala {title}</RoomName>
+        {questions.length > 0 && <Pill>{questions.length} pergunta(s)</Pill>}
       </TitleContainer>
 
       <Content>
@@ -76,6 +124,8 @@ export const Room = ({ ...props }: RoomProps) => {
             Enviar pergunta
           </SendQuestionButton>
         </AskContainer>
+
+        <pre>{JSON.stringify(questions, null, 2)}</pre>
       </Content>
     </StyledRoom>
   )
