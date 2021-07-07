@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from "react"
-import styled from "styled-components"
+import styled from "styled-components/macro"
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text?: string | ReactNode
