@@ -4,9 +4,11 @@ import { ReactComponent as CopySvg } from "../assets/images/copy.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { Button } from "./Button"
 
-interface HeaderProps {}
+interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
+  roomCode: string
+}
 
-export const Header = ({ ...props }: HeaderProps) => {
+export const Header = ({ roomCode, ...props }: HeaderProps) => {
   return (
     <StyledHeader {...props}>
       <img src={logoSvg} alt="Let me ask" style={{ height: 45 }} />
@@ -16,7 +18,7 @@ export const Header = ({ ...props }: HeaderProps) => {
           <div className="icon-wrapper">
             <CopyIcon />
           </div>
-          <span>Sala #323243</span>
+          <span>Sala #{roomCode}</span>
         </CopyPageIdButton>
 
         <CloseRoomButton>Encerrar sala</CloseRoomButton>
