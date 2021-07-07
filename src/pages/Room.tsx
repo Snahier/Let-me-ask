@@ -1,8 +1,11 @@
 import { darken } from "polished"
+import { FormEvent, useContext, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
+import { AuthContext } from "../contexts/AuthContext"
+import { database } from "../services/firebase"
 
 type RoomParams = {
   id: string
@@ -11,11 +14,36 @@ type RoomParams = {
 interface RoomProps {}
 
 export const Room = ({ ...props }: RoomProps) => {
-  const params = useParams<RoomParams>()
+  const { user } = useContext(AuthContext)
+  const { id: roomId } = useParams<RoomParams>()
+
+  const [newQuestion, setNewQuestion] = useState("")
+
+  const handleSendQuestion = async (event: FormEvent) => {
+    event.preventDefault()
+
+    if (newQuestion.trim() === "") return
+
+    if (!user) throw new Error("User not authenticated")
+
+    const question = {
+      content: newQuestion,
+      author: {
+        name: user.name,
+        avatar: user.avatar,
+      },
+      isHighlited: false,
+      isAnswered: false,
+    }
+
+    await database.ref(`/rooms/${roomId}/questions`).push(question)
+
+    setNewQuestion("")
+  }
 
   return (
     <StyledRoom {...props}>
-      <Header roomCode={params.id} style={{ gridArea: "header" }} />
+      <Header roomCode={roomId} style={{ gridArea: "header" }} />
 
       <TitleContainer>
         <RoomName>Sala React Q&amp;A</RoomName>
@@ -24,13 +52,19 @@ export const Room = ({ ...props }: RoomProps) => {
 
       <Content>
         <AskContainer>
-          <TextArea placeholder="O que você quer perguntar?" />
+          <TextArea
+            placeholder="O que você quer perguntar?"
+            value={newQuestion}
+            onChange={(event) => setNewQuestion(event.target.value)}
+          />
 
           <LogInText>
             Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
           </LogInText>
 
-          <SendQuestionButton disabled>Enviar pergunta</SendQuestionButton>
+          <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
+            Enviar pergunta
+          </SendQuestionButton>
         </AskContainer>
       </Content>
     </StyledRoom>
@@ -84,7 +118,7 @@ const Content = styled.div`
   margin-top: 1rem;
 `
 
-const AskContainer = styled.div`
+const AskContainer = styled.form`
   display: grid;
   grid:
     "textarea textarea  "
