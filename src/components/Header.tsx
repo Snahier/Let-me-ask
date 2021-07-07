@@ -1,5 +1,6 @@
 import { darken } from "polished"
-import styled, { css } from "styled-components"
+import { HTMLAttributes } from "react"
+import styled, { css } from "styled-components/macro"
 import { ReactComponent as CopySvg } from "../assets/images/copy.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { Button } from "./Button"
@@ -9,12 +10,14 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Header = ({ roomCode, ...props }: HeaderProps) => {
+  const copyRoomToClipboard = () => navigator.clipboard.writeText(roomCode)
+
   return (
     <StyledHeader {...props}>
       <img src={logoSvg} alt="Let me ask" style={{ height: 45 }} />
 
       <ButtonsContainer>
-        <CopyPageIdButton>
+        <CopyPageIdButton onClick={copyRoomToClipboard}>
           <div className="icon-wrapper">
             <CopyIcon />
           </div>
