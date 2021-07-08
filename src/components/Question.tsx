@@ -1,8 +1,5 @@
+import { ReactNode } from "react"
 import styled, { css } from "styled-components"
-import { ReactComponent as AnswerSvg } from "../assets/images/answer.svg"
-import { ReactComponent as CheckSvg } from "../assets/images/check.svg"
-import { ReactComponent as DeleteSvg } from "../assets/images/delete.svg"
-import { ReactComponent as LikeSvg } from "../assets/images/like.svg"
 
 type Author = {
   avatar: string
@@ -17,10 +14,12 @@ interface QuestionProps {
     isAnswered: boolean
     isHighlighted: boolean
   }
+  children: ReactNode
 }
 
 export const Question = ({
   data: { id, author, content, isAnswered, isHighlighted },
+  children,
   ...props
 }: QuestionProps) => {
   return id ? (
@@ -32,12 +31,7 @@ export const Question = ({
         <Name>{author.name}</Name>
       </AuthorContainer>
 
-      <Actions style={{ gap: true ? "1rem" : "0.5rem" }}>
-        1 <LikeSvg />
-        <CheckSvg />
-        <AnswerSvg />
-        <DeleteSvg />
-      </Actions>
+      <Actions>{children}</Actions>
     </StyledQuestion>
   ) : null
 }
@@ -86,16 +80,12 @@ const Name = styled.span`
 `
 
 const Actions = styled.div`
-  ${({ theme }) => css`
-    grid-area: actions;
+  grid-area: actions;
 
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    align-items: end;
-    justify-content: end;
-    gap: 0.5rem;
-
-    color: ${theme.colors.grayDark};
-  `}
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  align-items: end;
+  justify-content: end;
+  gap: 1rem;
 `
