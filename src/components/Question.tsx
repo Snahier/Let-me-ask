@@ -1,4 +1,7 @@
 import styled, { css } from "styled-components"
+import { ReactComponent as AnswerSvg } from "../assets/images/answer.svg"
+import { ReactComponent as CheckSvg } from "../assets/images/check.svg"
+import { ReactComponent as DeleteSvg } from "../assets/images/delete.svg"
 import { ReactComponent as LikeSvg } from "../assets/images/like.svg"
 
 type Author = {
@@ -29,8 +32,11 @@ export const Question = ({
         <Name>{author.name}</Name>
       </AuthorContainer>
 
-      <Actions>
+      <Actions style={{ gap: true ? "1rem" : "0.5rem" }}>
         1 <LikeSvg />
+        <CheckSvg />
+        <AnswerSvg />
+        <DeleteSvg />
       </Actions>
     </StyledQuestion>
   ) : null
