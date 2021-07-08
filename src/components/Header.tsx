@@ -1,10 +1,12 @@
 import { darken } from "polished"
 import { HTMLAttributes, useContext } from "react"
+import { useHistory } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
 import { ReactComponent as CopySvg } from "../assets/images/copy.svg"
 import logoSvg from "../assets/images/logo.svg"
 import { AuthContext } from "../contexts/AuthContext"
 import { useRoom } from "../hooks/useRoom"
+import { database } from "../services/firebase"
 import { Button } from "./Button"
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
@@ -12,9 +14,19 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Header = ({ roomCode, ...props }: HeaderProps) => {
-  const copyRoomToClipboard = () => navigator.clipboard.writeText(roomCode)
   const { user } = useContext(AuthContext)
   const { authorId } = useRoom(roomCode)
+  const history = useHistory()
+
+  const copyRoomToClipboard = () => navigator.clipboard.writeText(roomCode)
+
+  const handleEndRoom = async () => {
+    await database.ref(`rooms/${roomCode}`).update({
+      endedAt: new Date(),
+    })
+
+    history.push("/")
+  }
 
   return (
     <StyledHeader {...props}>
@@ -29,7 +41,9 @@ export const Header = ({ roomCode, ...props }: HeaderProps) => {
         </CopyPageIdButton>
 
         {user?.id === authorId && (
-          <CloseRoomButton>Encerrar sala</CloseRoomButton>
+          <CloseRoomButton onClick={handleEndRoom}>
+            Encerrar sala
+          </CloseRoomButton>
         )}
       </ButtonsContainer>
     </StyledHeader>
