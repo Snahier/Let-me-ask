@@ -2,6 +2,7 @@ import { darken } from "polished"
 import { FormEvent, useContext, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import styled, { css } from "styled-components/macro"
+import { ReactComponent as LikeSvg } from "../assets/images/like.svg"
 import { Button } from "../components/Button"
 import { Header } from "../components/Header"
 import { Question } from "../components/Question"
@@ -9,7 +10,7 @@ import { AuthContext } from "../contexts/AuthContext"
 import { useRoom } from "../hooks/useRoom"
 import { database } from "../services/firebase"
 
-type RoomParams = {
+type RouteParams = {
   id: string
 }
 
@@ -17,8 +18,8 @@ interface RoomProps {}
 
 export const Room = ({ ...props }: RoomProps) => {
   const { user } = useContext(AuthContext)
-  const { id: roomId } = useParams<RoomParams>()
-  const { questions, title } = useRoom(roomId)
+  const { id: roomId } = useParams<RouteParams>()
+  const { questions, title, authorId } = useRoom(roomId)
 
   const [newQuestion, setNewQuestion] = useState("")
 
@@ -44,6 +45,21 @@ export const Room = ({ ...props }: RoomProps) => {
     setNewQuestion("")
   }
 
+  const handleLikeQuestion = async (
+    questionId: string,
+    likeId: string | undefined
+  ) => {
+    if (likeId) {
+      await database
+        .ref(`rooms/${roomId}/questions/${questionId}/likes/${likeId}`)
+        .remove()
+    } else {
+      await database.ref(`rooms/${roomId}/questions/${questionId}/likes`).push({
+        authorId: user?.id,
+      })
+    }
+  }
+
   return (
     <StyledRoom {...props}>
       <Header roomCode={roomId} style={{ gridArea: "header" }} />
@@ -53,32 +69,44 @@ export const Room = ({ ...props }: RoomProps) => {
         {questions.length > 0 && <Pill>{questions.length} pergunta(s)</Pill>}
       </TitleContainer>
 
-      <AskContainer>
-        <TextArea
-          placeholder="O que você quer perguntar?"
-          value={newQuestion}
-          onChange={(event) => setNewQuestion(event.target.value)}
-        />
+      {user?.id !== authorId && (
+        <AskContainer>
+          <TextArea
+            placeholder="O que você quer perguntar?"
+            value={newQuestion}
+            onChange={(event) => setNewQuestion(event.target.value)}
+          />
 
-        {user ? (
-          <UserContainer>
-            <UserAvatar src={user.avatar as string} alt={user.name as string} />
-            <UserName>{user.name}</UserName>
-          </UserContainer>
-        ) : (
-          <LogInText>
-            Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
-          </LogInText>
-        )}
+          {user ? (
+            <UserContainer>
+              <UserAvatar
+                src={user.avatar as string}
+                alt={user.name as string}
+              />
+              <UserName>{user.name}</UserName>
+            </UserContainer>
+          ) : (
+            <LogInText>
+              Para enviar uma pergunta, <Link to="/">faça seu login</Link>.
+            </LogInText>
+          )}
 
-        <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
-          Enviar pergunta
-        </SendQuestionButton>
-      </AskContainer>
+          <SendQuestionButton disabled={!user} onClick={handleSendQuestion}>
+            Enviar pergunta
+          </SendQuestionButton>
+        </AskContainer>
+      )}
 
       <QuestionsContainer>
         {questions.map((question) => (
-          <Question key={question.id} data={question} />
+          <Question key={question.id} data={question}>
+            <LikeIconButton
+              active={Boolean(question?.likeId)}
+              onClick={() => handleLikeQuestion(question.id, question?.likeId)}
+            >
+              {question.likeCount || null} <LikeSvg />
+            </LikeIconButton>
+          </Question>
         ))}
       </QuestionsContainer>
     </StyledRoom>
@@ -214,4 +242,32 @@ const QuestionsContainer = styled.div`
   grid-auto-rows: max-content;
 
   margin-top: 2rem;
+`
+
+type IconButtonProps = {
+  active?: boolean
+}
+const IconButton = styled.button<IconButtonProps>`
+  ${({ theme, active }) => css`
+    transition: filter 0.2s;
+    border: none;
+    background: transparent;
+
+    font-size: 0;
+
+    color: ${active ? theme.colors.purple : theme.colors.grayDark};
+
+    &:hover {
+      filter: brightness(0.7);
+    }
+  `}
+`
+
+const LikeIconButton = styled(IconButton)`
+  display: grid;
+  grid-auto-flow: column;
+  align-items: end;
+  gap: 0.5rem;
+
+  font-size: 1rem;
 `
