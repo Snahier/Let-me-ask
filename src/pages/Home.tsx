@@ -36,6 +36,11 @@ export const Home = ({ ...props }: HomeProps) => {
       return
     }
 
+    if (roomRef.val().endedAt) {
+      alert("Room closed")
+      return
+    }
+
     history.push(`/rooms/${roomCode}`)
   }
 
