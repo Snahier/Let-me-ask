@@ -1,8 +1,10 @@
 import { darken } from "polished"
-import { HTMLAttributes } from "react"
+import { HTMLAttributes, useContext } from "react"
 import styled, { css } from "styled-components/macro"
 import { ReactComponent as CopySvg } from "../assets/images/copy.svg"
 import logoSvg from "../assets/images/logo.svg"
+import { AuthContext } from "../contexts/AuthContext"
+import { useRoom } from "../hooks/useRoom"
 import { Button } from "./Button"
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,6 +13,8 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
 
 export const Header = ({ roomCode, ...props }: HeaderProps) => {
   const copyRoomToClipboard = () => navigator.clipboard.writeText(roomCode)
+  const { user } = useContext(AuthContext)
+  const { authorId } = useRoom(roomCode)
 
   return (
     <StyledHeader {...props}>
@@ -24,7 +28,9 @@ export const Header = ({ roomCode, ...props }: HeaderProps) => {
           <span>Sala #{roomCode}</span>
         </CopyPageIdButton>
 
-        <CloseRoomButton>Encerrar sala</CloseRoomButton>
+        {user?.id === authorId && (
+          <CloseRoomButton>Encerrar sala</CloseRoomButton>
+        )}
       </ButtonsContainer>
     </StyledHeader>
   )
