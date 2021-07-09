@@ -18,12 +18,16 @@ interface QuestionProps {
 }
 
 export const Question = ({
-  data: { id, author, content, isAnswered, isHighlighted },
+  data: { id, author, content, isAnswered = false, isHighlighted = false },
   children,
   ...props
 }: QuestionProps) => {
   return id ? (
-    <StyledQuestion {...props}>
+    <StyledQuestion
+      {...props}
+      isAnswered={isAnswered}
+      isHighlighted={isHighlighted}
+    >
       <Content>{content}</Content>
 
       <AuthorContainer>
@@ -36,8 +40,12 @@ export const Question = ({
   ) : null
 }
 
-const StyledQuestion = styled.div`
-  ${({ theme }) => css`
+type StyledQuestionProps = {
+  isAnswered: boolean
+  isHighlighted: boolean
+}
+const StyledQuestion = styled.div<StyledQuestionProps>`
+  ${({ theme, isAnswered, isHighlighted }) => css`
     display: grid;
     grid:
       "content content"
@@ -50,6 +58,18 @@ const StyledQuestion = styled.div`
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.04);
     border-radius: 0.5rem;
     background: ${theme.colors.whiteDetails};
+
+    ${isHighlighted &&
+    css`
+      border: 1px solid ${theme.colors.purple};
+      background: #f4f0ff;
+    `}
+
+    ${isAnswered &&
+    css`
+      border: 1px solid transparent;
+      background: ${theme.colors.grayLight};
+    `}
   `}
 `
 
