@@ -24,6 +24,18 @@ export const AdminRoom = ({ ...props }: AdminRoomProps) => {
     }
   }
 
+  const handleCheckQuestionAsAnswered = async (questionId: string) => {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isAnswered: true,
+    })
+  }
+
+  const handleHighlightQuestion = async (questionId: string) => {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isHighlighted: true,
+    })
+  }
+
   return (
     <StyledAdminRoom {...props}>
       <Header roomCode={roomId} style={{ gridArea: "header" }} />
@@ -36,14 +48,22 @@ export const AdminRoom = ({ ...props }: AdminRoomProps) => {
       <QuestionsContainer>
         {questions.map((question) => (
           <Question key={question.id} data={question}>
-            <IconButton>
-              <CheckSvg />
-            </IconButton>
-
-            <IconButton>
-              <AnswerSvg />
-            </IconButton>
-
+            {!question.isAnswered && (
+              <>
+                <IconButton
+                  active={question.isAnswered}
+                  onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                >
+                  <CheckSvg />
+                </IconButton>
+                <IconButton
+                  active={question.isHighlighted}
+                  onClick={() => handleHighlightQuestion(question.id)}
+                >
+                  <AnswerSvg />
+                </IconButton>
+              </>
+            )}
             <IconButton onClick={() => handleDeleteQuestion(question.id)}>
               <DeleteSvg />
             </IconButton>
