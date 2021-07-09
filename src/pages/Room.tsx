@@ -100,12 +100,16 @@ export const Room = ({ ...props }: RoomProps) => {
       <QuestionsContainer>
         {questions.map((question) => (
           <Question key={question.id} data={question}>
-            <LikeIconButton
-              active={Boolean(question?.likeId)}
-              onClick={() => handleLikeQuestion(question.id, question?.likeId)}
-            >
-              {question.likeCount || null} <LikeSvg />
-            </LikeIconButton>
+            {!question.isAnswered && (
+              <LikeIconButton
+                active={Boolean(question?.likeId)}
+                onClick={() =>
+                  handleLikeQuestion(question.id, question?.likeId)
+                }
+              >
+                {question.likeCount || null} <LikeSvg />
+              </LikeIconButton>
+            )}
           </Question>
         ))}
       </QuestionsContainer>
